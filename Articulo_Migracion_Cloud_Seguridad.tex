@@ -1,0 +1,282 @@
+\documentclass[12pt, a4paper]{article}
+
+% ── Codificación y lenguaje ──────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+
+% ── Tipografía ───────────────────────────────────────────────────────────────
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ── Márgenes y espaciado ─────────────────────────────────────────────────────
+\usepackage[top=2.54cm, bottom=2.54cm, left=3cm, right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Tablas y figuras ─────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+% ── Hipervínculos y referencias ──────────────────────────────────────────────
+\usepackage[hidelinks]{hyperref}
+\usepackage{csquotes}
+\usepackage[style=apa, backend=biber, language=spanish]{biblatex}
+
+% ── Bibliografía inline (sin archivo .bib externo) ──────────────────────────
+\addbibresource{referencias.bib}
+
+% ── Cabecera y pie de página ─────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small Migración \textit{cloud} desde la seguridad}
+\lhead{\small Politécnico Grancolombiano}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Secciones sin sangría ────────────────────────────────────────────────────
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% ── Colores de tablas comparativas ───────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31, 73, 125}
+\definecolor{rowlight}{RGB}{217, 229, 241}
+\definecolor{rowwhite}{RGB}{255, 255, 255}
+
+% ════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ════════════════════════════════════════════════════════════════════════════
+
+% ── Portada tipo artículo ────────────────────────────────────────────────────
+\begin{center}
+  {\Large \textbf{Migración \textit{cloud} desde la seguridad:}}\\[4pt]
+  {\large \textbf{Análisis de servicios en la nube para una empresa de tecnología colombiana}}\\[18pt]
+  {\normalsize Alejandro De Mendoza}\\[4pt]
+  {\small Estudiante, Fundamentos de la Tecnología \textit{Cloud} — Unidad 3}\\
+  {\small Politécnico Grancolombiano}\\[4pt]
+  {\small \today}
+\end{center}
+
+\hrule
+\vspace{6pt}
+
+% ── Abstract ────────────────────────────────────────────────────────────────
+\begin{abstract}
+\noindent
+El presente artículo analiza la estrategia de migración hacia servicios en la nube de \textbf{TechSoluciones S.A.S.}, empresa colombiana de desarrollo de software ubicada en Bogotá. Se identifican las tecnologías actuales de la organización, se proponen tres servicios cloud concretos con énfasis en seguridad y disponibilidad, y se realiza un comparativo con proveedores alternativos. El análisis concluye que una arquitectura híbrida basada en \textit{Amazon Web Services} (AWS), con capas de seguridad perimetral e identidad, representa la opción más sólida para empresas medianas del sector TIC en Colombia, sin descartar ventajas puntuales de Microsoft Azure y Google Cloud Platform.
+\end{abstract}
+
+\vspace{6pt}
+\hrule
+\vspace{10pt}
+
+\textbf{Palabras clave:} computación en la nube, seguridad, AWS, Azure, migración, Colombia, ransomware, bases de datos.
+
+\vspace{14pt}
+
+% ════════════════════════════════════════════════════════════════════════════
+\section{Introducción}
+% ════════════════════════════════════════════════════════════════════════════
+
+La transformación digital en Colombia ha acelerado la adopción de servicios en la nube en sectores que históricamente operaban con infraestructura local. Amenazas como \textit{WannaCry} y distintas variantes de \textit{ransomware} han puesto en evidencia la fragilidad de los modelos \textit{on-premise} sin políticas robustas de respaldo y segmentación de red \autocite{NIST2011}. En este contexto, migrar cargas de trabajo críticas hacia plataformas \textit{cloud} no es únicamente una decisión de eficiencia operativa, sino una necesidad estratégica de resiliencia.
+
+Este artículo parte del caso de \textbf{TechSoluciones S.A.S.}, empresa del sector TIC con sede en Bogotá y aproximadamente 120 empleados, dedicada al desarrollo de software a medida y a la integración de sistemas ERP para clientes corporativos. A lo largo del documento se describen las tecnologías actuales de la empresa, se justifica la selección de tres servicios \textit{cloud} y se contrastan con alternativas equivalentes de otros proveedores líderes del mercado.
+
+% ════════════════════════════════════════════════════════════════════════════
+\section{Descripción de la empresa y tecnologías actuales}
+% ════════════════════════════════════════════════════════════════════════════
+
+TechSoluciones S.A.S. opera actualmente con una infraestructura mixta: servidores físicos propios para bases de datos transaccionales, un directorio activo local (\textit{Windows Server 2019}) para gestión de identidades, y un clúster de máquinas virtuales basadas en \textit{VMware vSphere} para entornos de desarrollo y pruebas. La conectividad con clientes se realiza a través de una VPN dedicada y un portal web alojado en un proveedor local de \textit{hosting}.
+
+Las principales vulnerabilidades identificadas en esta arquitectura son:
+
+\begin{itemize}
+  \item Ausencia de replicación geográfica en las bases de datos de producción.
+  \item Procesos de \textit{backup} manuales con frecuencia semanal, lo que expone a pérdidas de datos significativas ante un ataque de \textit{ransomware}.
+  \item Escalabilidad limitada: los picos de demanda en períodos de cierre contable obligan a aprovisionar hardware de forma anticipada y costosa.
+  \item Gestión de parches dependiente del equipo interno, con ventanas de mantenimiento que generan tiempo de inactividad.
+\end{itemize}
+
+Esta realidad es representativa de muchas empresas medianas del sector TIC en Colombia, donde la adopción \textit{cloud} aún convive con legados tecnológicos significativos \autocite{MinTIC2023}.
+
+% ════════════════════════════════════════════════════════════════════════════
+\section{Servicios cloud propuestos}
+% ════════════════════════════════════════════════════════════════════════════
+
+A continuación se presentan los tres servicios seleccionados, todos disponibles en la región \texttt{us-east-1} de AWS, que es la de menor latencia para Colombia y con la que se tiene mayor experiencia de soporte local.
+
+% ──────────────────────────────────────────────────────────────────────────
+\subsection{Amazon RDS for PostgreSQL (Base de datos gestionada)}
+% ──────────────────────────────────────────────────────────────────────────
+
+\textbf{Amazon Relational Database Service} (RDS) permite desplegar, operar y escalar bases de datos relacionales en la nube sin gestionar la infraestructura subyacente \autocite{AWS2024RDS}. Para TechSoluciones, la configuración propuesta es una instancia \texttt{db.t3.medium} con Multi-AZ habilitado, lo que garantiza conmutación por error automática ante fallos de zona de disponibilidad.
+
+Desde la perspectiva de seguridad, RDS ofrece:
+
+\begin{itemize}
+  \item Cifrado en reposo mediante \textit{AWS Key Management Service} (KMS).
+  \item Cifrado en tránsito con TLS/SSL forzado a nivel de parámetro de instancia.
+  \item \textit{Automated backups} con retención configurable de hasta 35 días.
+  \item Integración con \textit{AWS IAM} para control de acceso basado en roles.
+  \item \textit{Enhanced Monitoring} y \textit{Performance Insights} para detección temprana de anomalías.
+\end{itemize}
+
+Este servicio elimina directamente el riesgo de pérdida de datos por \textit{ransomware} local, ya que los respaldos residen en almacenamiento S3 cifrado, desacoplado de la red de producción.
+
+% ──────────────────────────────────────────────────────────────────────────
+\subsection{AWS WAF + AWS Shield Standard (Seguridad perimetral web)}
+% ──────────────────────────────────────────────────────────────────────────
+
+\textbf{AWS WAF} (\textit{Web Application Firewall}) es un servicio gestionado que filtra solicitudes HTTP/HTTPS maliciosas antes de que alcancen las aplicaciones, mientras que \textbf{AWS Shield Standard} proporciona protección automática contra ataques de denegación de servicio distribuido (DDoS) sin costo adicional para todos los recursos de AWS \autocite{AWS2024WAF}.
+
+La relevancia de este servicio para TechSoluciones radica en que el portal web actual carece de cualquier capa de filtrado de tráfico. AWS WAF permite definir reglas administradas (OWASP Top 10, bots maliciosos, inyección SQL, XSS) y reglas personalizadas basadas en IP, cabeceras o patrones de cuerpo de solicitud.
+
+Un aspecto diferenciador es la integración nativa con \textit{Amazon CloudFront} (CDN), lo que reduce la latencia para usuarios colombianos al servir contenido estático desde puntos de presencia en Bogotá y São Paulo, simultáneamente que el tráfico es inspeccionado antes de llegar al origen.
+
+% ──────────────────────────────────────────────────────────────────────────
+\subsection{AWS IAM Identity Center (Gestión centralizada de identidades)}
+% ──────────────────────────────────────────────────────────────────────────
+
+La migración de un Directorio Activo local hacia \textbf{AWS IAM Identity Center} (anteriormente AWS SSO) permite a TechSoluciones unificar la gestión de accesos a las consolas de AWS, aplicaciones de terceros (Salesforce, Jira, GitHub) y herramientas internas bajo un único proveedor de identidad \autocite{AWS2024IAM}. La integración con el AD existente se realiza mediante \textit{AWS Directory Service for Microsoft Active Directory} en fase de transición.
+
+Las ventajas en términos de seguridad son:
+
+\begin{itemize}
+  \item Autenticación multifactor (MFA) obligatoria para todos los usuarios con acceso a consola.
+  \item Principio de mínimo privilegio aplicado mediante conjuntos de permisos granulares.
+  \item \textit{AWS CloudTrail} registra toda actividad de API, lo que facilita auditorías y respuesta a incidentes.
+  \item Eliminación de credenciales de larga duración (\textit{access keys}) para accesos humanos.
+\end{itemize}
+
+% ════════════════════════════════════════════════════════════════════════════
+\section{Comparativo con servicios paralelos en otros proveedores}
+% ════════════════════════════════════════════════════════════════════════════
+
+La Tabla~\ref{tab:comparativo} sintetiza el análisis comparativo entre los servicios seleccionados en AWS y sus equivalentes más directos en Microsoft Azure y Google Cloud Platform (GCP).
+
+\vspace{8pt}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.2cm}
+                  >{\raggedright\arraybackslash}p{3.5cm}
+                  >{\raggedright\arraybackslash}p{3.5cm}
+                  >{\raggedright\arraybackslash}p{3.5cm}}
+
+\rowcolor{headerblue}
+\textcolor{white}{\textbf{Dimensión}} &
+\textcolor{white}{\textbf{AWS (propuesto)}} &
+\textcolor{white}{\textbf{Microsoft Azure}} &
+\textcolor{white}{\textbf{Google Cloud (GCP)}} \\
+\endfirsthead
+
+\rowcolor{headerblue}
+\textcolor{white}{\textbf{Dimensión}} &
+\textcolor{white}{\textbf{AWS (propuesto)}} &
+\textcolor{white}{\textbf{Microsoft Azure}} &
+\textcolor{white}{\textbf{Google Cloud (GCP)}} \\
+\endhead
+
+\caption{Comparativo de servicios cloud por proveedor.}
+\label{tab:comparativo}\\
+
+\rowcolor{rowlight}
+\textbf{BD relacional} & Amazon RDS for PostgreSQL & Azure Database for PostgreSQL (Flexible Server) & Cloud SQL for PostgreSQL \\
+
+\rowcolor{rowwhite}
+\textbf{Multi-AZ / Alta disp.} & Nativo, failover automático en $<$120s & Zona redundante habilitada desde consola & Alta disponibilidad regional \\
+
+\rowcolor{rowlight}
+\textbf{Backup automático} & 1–35 días, S3 cifrado & 1–35 días, Azure Backup & 1–7 días (plan básico) \\
+
+\rowcolor{rowwhite}
+\textbf{Firewall web} & AWS WAF + Shield Std. & Azure Front Door + WAF & Cloud Armor \\
+
+\rowcolor{rowlight}
+\textbf{Reglas OWASP gestionadas} & Sí (Core Rule Set 3.2) & Sí (OWASP 3.2 integrado) & Sí (preconfiguradas) \\
+
+\rowcolor{rowwhite}
+\textbf{Protección DDoS} & Shield Standard (gratuito) / Shield Advanced & Azure DDoS Protection (Básico gratuito / Estándar \$2500/mes) & Cloud Armor Standard \\
+
+\rowcolor{rowlight}
+\textbf{Gestión de identidades} & IAM Identity Center (SSO) & Microsoft Entra ID (Azure AD) & Cloud Identity \\
+
+\rowcolor{rowwhite}
+\textbf{MFA nativa} & Sí (TOTP, hardware FIDO2) & Sí (integrada con Microsoft Authenticator) & Sí (TOTP, llaves de seguridad) \\
+
+\rowcolor{rowlight}
+\textbf{Integración con AD local} & AWS Directory Service for Microsoft AD & Azure AD Connect (nativo) & Google Cloud Directory Sync \\
+
+\rowcolor{rowwhite}
+\textbf{Presencia en Colombia} & Baja latencia vía us-east-1 / São Paulo & Latencia moderada (región Brasil) & Nodos de borde en Bogotá \\
+
+\rowcolor{rowlight}
+\textbf{Madurez del ecosistema} & Líder (mayor catálogo, +200 servicios) & Sólido para entornos Microsoft & Excelente en datos y ML \\
+
+\rowcolor{rowwhite}
+\textbf{Soporte local en Colombia} & Amplia red de partners certificados & Creciente presencia de partners & Limitada, principalmente partner-led \\
+
+\end{longtable}
+
+\vspace{4pt}
+
+\textbf{Justificación de la elección de AWS:} Si bien Azure ofrece una integración nativa superior con entornos Microsoft (relevante dada la existencia de Windows Server y AD), AWS presenta un ecosistema más maduro para empresas que buscan flexibilidad multilenguaje, una comunidad técnica más amplia en Colombia y un precio competitivo en la capa gratuita de Shield. El componente decisivo es la disponibilidad de soporte especializado local: la red de \textit{AWS Partners} con certificaciones en Colombia es notablemente más extensa, lo que reduce la barrera de adopción para una empresa de tamaño mediano \autocite{IDC2023}.
+
+GCP representa una alternativa interesante en el mediano plazo, especialmente si TechSoluciones expande su oferta hacia analítica de datos y modelos de \textit{machine learning}, donde BigQuery y Vertex AI no tienen rival. Sin embargo, para el caso de uso inmediato —base de datos transaccional segura, WAF y gestión de identidades— AWS ofrece una curva de madurez operativa más corta.
+
+% ════════════════════════════════════════════════════════════════════════════
+\section{Consideraciones de seguridad ante amenazas actuales}
+% ════════════════════════════════════════════════════════════════════════════
+
+El vector de ataque de \textit{ransomware} como \textit{WannaCry} explota principalmente vulnerabilidades en protocolos SMB expuestos en redes planas sin segmentación. La arquitectura propuesta mitiga este riesgo de forma estructural mediante tres mecanismos:
+
+\begin{enumerate}
+  \item \textbf{Aislamiento de red:} Las instancias RDS residen en subredes privadas dentro de una \textit{VPC} dedicada, sin rutas de acceso directo desde Internet.
+  \item \textbf{Control de tráfico entrante:} AWS WAF bloquea firmas conocidas de exploits web antes de que el tráfico alcance las capas de aplicación.
+  \item \textbf{Respaldos inmutables:} Los \textit{snapshots} automáticos de RDS no pueden ser eliminados por cuentas de usuario convencionales; requieren permisos IAM explícitos con condiciones de MFA, lo que impide que un proceso de \textit{ransomware} borre los respaldos.
+\end{enumerate}
+
+Esta combinación se alinea con el marco \textit{NIST Cybersecurity Framework} en sus funciones de \textit{Protect}, \textit{Detect} y \textit{Recover} \autocite{NIST2011}, proporcionando una postura de seguridad multicapa que no depende de un único punto de control.
+
+% ════════════════════════════════════════════════════════════════════════════
+\section{Conclusiones}
+% ════════════════════════════════════════════════════════════════════════════
+
+La migración \textit{cloud} de TechSoluciones S.A.S. no es un objetivo tecnológico aislado, sino la respuesta lógica a un entorno de amenazas en constante evolución y a las limitaciones inherentes de la infraestructura \textit{on-premise} en empresas medianas. Los tres servicios propuestos —Amazon RDS for PostgreSQL, AWS WAF + Shield y AWS IAM Identity Center— forman una arquitectura coherente que cubre los flancos más críticos: persistencia de datos, seguridad perimetral e identidad.
+
+El comparativo con Azure y GCP muestra que ningún proveedor domina en todas las dimensiones. La decisión por AWS se fundamenta en la madurez del ecosistema, la densidad de soporte local en Colombia y el costo de entrada para una organización que no parte de cero en términos técnicos. No obstante, una estrategia \textit{multi-cloud} progresiva —iniciando con AWS y evolucionando hacia GCP para cargas analíticas— representaría el escenario óptimo a largo plazo.
+
+Finalmente, la seguridad no debe entenderse como un añadido posterior a la arquitectura \textit{cloud}, sino como una dimensión de diseño desde el primer día. El principio de \textit{security by default}, presente en los servicios analizados, garantiza que incluso configuraciones básicas ofrezcan un nivel de protección superior al de la mayoría de las instalaciones locales existentes en el mercado colombiano.
+
+% ════════════════════════════════════════════════════════════════════════════
+% Referencias
+% ════════════════════════════════════════════════════════════════════════════
+
+\section*{Referencias}
+\addcontentsline{toc}{section}{Referencias}
+\hrule
+\vspace{8pt}
+
+Las siguientes fuentes sustentan el análisis presentado en este artículo. Se incluyen documentos técnicos oficiales de los proveedores \textit{cloud}, reportes de la industria y marcos normativos internacionales relevantes para el contexto de seguridad y adopción \textit{cloud} en Colombia. Todas las referencias están organizadas en formato APA séptima edición.
+
+\vspace{8pt}
+
+\begin{itemize}
+  \item Amazon Web Services. (2024a). \textit{Amazon RDS for PostgreSQL}. \url{https://aws.amazon.com/rds/postgresql/}
+
+  \item Amazon Web Services. (2024b). \textit{AWS WAF — Web Application Firewall}. \url{https://aws.amazon.com/waf/}
+
+  \item Amazon Web Services. (2024c). \textit{AWS IAM Identity Center}. \url{https://aws.amazon.com/iam/identity-center/}
+
+  \item IDC Latin America. (2023). \textit{Cloud Market Share and Trends in Latin America 2023}. International Data Corporation.
+
+  \item Ministerio de Tecnologías de la Información y las Comunicaciones. (2023). \textit{Índice de Adopción Digital Empresarial en Colombia}. MinTIC. \url{https://www.mintic.gov.co}
+
+  \item National Institute of Standards and Technology. (2011). \textit{The NIST Definition of Cloud Computing} (Special Publication 800-145). U.S. Department of Commerce. \url{https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-145.pdf}
+\end{itemize}
+
+\end{document}
