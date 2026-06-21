@@ -25,6 +25,21 @@ El artículo analiza la estrategia de migración hacia servicios en la nube de *
 
 ---
 
+## Arquitectura
+
+```mermaid
+flowchart TD
+    A[Articulo_Migracion_Cloud_Seguridad.tex] --> B[referencias.bib - BibTeX]
+    A --> C[Compilacion LaTeX - PDF]
+    C --> D[Articulo_Migracion_Cloud_Seguridad.pdf]
+    D --> E[Diagnostico infraestructura on-premise TechSoluciones S.A.S.]
+    E --> F{Estrategia de migracion cloud}
+    F --> G[(AWS - WAF / Shield / IAM Identity Center)]
+    F --> H[(Azure - comparativo de servicios)]
+    F --> I[(GCP - comparativo de servicios)]
+    G --> J[Arquitectura hibrida propuesta - seguridad perimetral + identidad]
+```
+
 ## Contenido del artículo
 
 | Sección | Descripción |
@@ -106,21 +121,6 @@ latexmk -pdf -bibtex Articulo_Migracion_Cloud_Seguridad.tex
 3. `Ctrl+Alt+V` — abrir preview PDF en panel lateral
 
 ---
-
-## Arquitectura
-
-```mermaid
-flowchart TD
-    A[Articulo_Migracion_Cloud_Seguridad.tex] --> B[referencias.bib - BibTeX]
-    A --> C[Compilacion LaTeX - PDF]
-    C --> D[Articulo_Migracion_Cloud_Seguridad.pdf]
-    D --> E[Diagnostico infraestructura on-premise TechSoluciones S.A.S.]
-    E --> F{Estrategia de migracion cloud}
-    F --> G[(AWS - WAF / Shield / IAM Identity Center)]
-    F --> H[(Azure - comparativo de servicios)]
-    F --> I[(GCP - comparativo de servicios)]
-    G --> J[Arquitectura hibrida propuesta - seguridad perimetral + identidad]
-```
 
 ## Estructura del repositorio
 
