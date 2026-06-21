@@ -1,3 +1,5 @@
+<div align="center">
+
 # Migración Cloud desde la Seguridad
 
 > **Análisis de servicios en la nube para una empresa de tecnología colombiana**
@@ -6,6 +8,10 @@
 ![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![PDF](https://img.shields.io/badge/PDF-Disponible-red?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)
 ![Politécnico Grancolombiano](https://img.shields.io/badge/Politécnico-Grancolombiano-blue?style=for-the-badge)
+
+</div>
+
+---
 
 ---
 
@@ -127,3 +133,12 @@ latexmk -pdf -bibtex Articulo_Migracion_Cloud_Seguridad.tex
 **Alejandro De Mendoza**
 Estudiante — Maestría en Arquitectura de Software
 Politécnico Grancolombiano · Fundamentos de la Tecnología Cloud
+
+---
+
+## Autor
+
+**Alejandro De Mendoza**  
+Ingeniero Informático · Especialista en IA · Especialista en Ingeniería de Software · Máster en Arquitectura de Software
+
+[![GitHub](https://img.shields.io/badge/GitHub-AlejoTechEngineer-181717?style=for-the-badge&logo=github)](https://github.com/AlejoTechEngineer)
